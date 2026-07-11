@@ -55,10 +55,21 @@ body {
   margin-bottom: 18px;
 }
 .header h1 {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   font-size: 23px;
   letter-spacing: -0.02em;
   font-weight: 700;
   margin: 0;
+}
+.header h1 .icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.icon {
+  display: inline-block;
+  vertical-align: middle;
 }
 .header p {
   margin: 0;
@@ -93,6 +104,10 @@ body {
   min-width: 120px;
 }
 button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   background: var(--accent);
   color: var(--accent-contrast);
   border: 1px solid transparent;

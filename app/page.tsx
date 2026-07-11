@@ -17,6 +17,55 @@ function biasLabel(bias: string) {
   return "NEUTRAL";
 }
 
+// Iconos SVG (estilo Lucide) — reemplazan emojis para verse igual en todo sistema.
+function CandleIcon() {
+  return (
+    <svg
+      className="icon"
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 5v4" />
+      <rect width="4" height="6" x="7" y="9" rx="1" />
+      <path d="M9 15v2" />
+      <path d="M17 3v2" />
+      <rect width="4" height="8" x="15" y="5" rx="1" />
+      <path d="M17 13v3" />
+      <path d="M3 3v18h18" />
+    </svg>
+  );
+}
+
+function SparklesIcon() {
+  return (
+    <svg
+      className="icon"
+      width="17"
+      height="17"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z" />
+      <path d="M20 3v4" />
+      <path d="M22 5h-4" />
+      <path d="M4 17v2" />
+      <path d="M5 18H3" />
+    </svg>
+  );
+}
+
 export default function Home() {
   const [symbol, setSymbol] = useState("BTCUSDT");
   const [interval, setInterval] = useState("1h");
@@ -123,7 +172,10 @@ export default function Home() {
   return (
     <main className="app">
       <div className="header">
-        <h1>🕯️ Detector de Velas Japonesas</h1>
+        <h1>
+          <CandleIcon />
+          Detector de Velas Japonesas
+        </h1>
         <p>Cripto · datos de Binance · gráfico estilo TradingView · veredicto con IA</p>
       </div>
 
@@ -162,7 +214,8 @@ export default function Home() {
           disabled={!data || analyzing}
           title={!data ? "Primero pulsa Analizar para cargar las velas" : undefined}
         >
-          {analyzing ? "Generando…" : "🤖 Veredicto con IA"}
+          <SparklesIcon />
+          {analyzing ? "Generando…" : "Veredicto con IA"}
         </button>
       </div>
       <p id="symbol-hint" className="hint">
