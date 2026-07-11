@@ -36,10 +36,15 @@ export default function Home() {
         `/api/candles?symbol=${encodeURIComponent(symbol)}&interval=${interval}`
       );
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Error al cargar datos");
+      if (!res.ok)
+        throw new Error(json.error || "No pudimos cargar las velas.");
       setData(json as CandlesResponse);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error desconocido");
+      setError(
+        e instanceof Error
+          ? e.message
+          : "No pudimos cargar las velas. Revisa tu conexión e inténtalo de nuevo."
+      );
       setData(null);
     } finally {
       setLoading(false);
@@ -119,18 +124,19 @@ export default function Home() {
     <main className="app">
       <div className="header">
         <h1>🕯️ Detector de Velas Japonesas</h1>
-        <p>Cripto · Binance · visualizacion TradingView · veredicto con IA</p>
+        <p>Cripto · datos de Binance · gráfico estilo TradingView · veredicto con IA</p>
       </div>
 
       <div className="controls">
         <div className="field">
-          <label htmlFor="symbol">Simbolo</label>
+          <label htmlFor="symbol">Símbolo</label>
           <input
             id="symbol"
             value={symbol}
             onChange={(e) => setSymbol(e.target.value.toUpperCase())}
             onKeyDown={(e) => e.key === "Enter" && load()}
             placeholder="BTCUSDT"
+            aria-describedby="symbol-hint"
           />
         </div>
         <div className="field">
@@ -148,16 +154,21 @@ export default function Home() {
           </select>
         </div>
         <button onClick={load} disabled={loading}>
-          {loading ? "Cargando…" : "Analizar"}
+          {loading ? "Cargando velas…" : "Analizar"}
         </button>
         <button
           className="secondary"
           onClick={analyze}
           disabled={!data || analyzing}
+          title={!data ? "Primero pulsa Analizar para cargar las velas" : undefined}
         >
-          {analyzing ? "Pensando…" : "🤖 Veredicto IA"}
+          {analyzing ? "Generando…" : "🤖 Veredicto con IA"}
         </button>
       </div>
+      <p id="symbol-hint" className="hint">
+        Escribe un par de Binance (ej. BTCUSDT, ETHUSDT, SOLUSDT) y elige el
+        intervalo.
+      </p>
 
       {error && <div className="error">{error}</div>}
 
@@ -167,7 +178,9 @@ export default function Home() {
             <CandleChart candles={data.candles} patterns={data.patterns} />
           ) : (
             <div style={{ padding: 20 }} className="muted">
-              {loading ? "Cargando velas…" : "Sin datos"}
+              {loading
+                ? "Cargando velas…"
+                : "Aún no hay velas. Escribe un símbolo y pulsa Analizar."}
             </div>
           )}
         </div>
@@ -181,35 +194,41 @@ export default function Home() {
                   <span className={`badge ${verdict.bias}`}>
                     {biasLabel(verdict.bias)}
                   </span>
-                  <span className="score">score {verdict.score}</span>
+                  <span
+                    className="score"
+                    title="Sesgo ponderado de los últimos patrones, de −100 (muy bajista) a +100 (muy alcista)"
+                  >
+                    sesgo {verdict.score > 0 ? `+${verdict.score}` : verdict.score}
+                  </span>
                 </div>
-                <div className="meter">
+                <div className="meter" aria-hidden="true">
                   <div className="pin" style={{ left: `${pinPct}%` }} />
                 </div>
                 <div className="muted">
                   {verdict.lastPattern
-                    ? `Ultimo patron: ${verdict.lastPattern.name}`
+                    ? `Último patrón: ${verdict.lastPattern.name}`
                     : "Sin patrones recientes claros"}
                 </div>
               </>
             ) : (
-              <div className="muted">—</div>
+              <div className="muted">Carga un símbolo para ver el veredicto.</div>
             )}
           </div>
 
           <div className="card">
-            <h2>Analisis IA (OpenAI)</h2>
+            <h2>Análisis con IA</h2>
             {analyzing || analysis ? (
               <div className="analysis">
-                {analysis || (analyzing ? "" : "")}
+                {analysis}
                 {analyzing && <span className="caret" aria-hidden="true" />}
                 {analyzing && !analysis && (
-                  <span className="muted">Pensando…</span>
+                  <span className="muted">Redactando el veredicto…</span>
                 )}
               </div>
             ) : (
               <div className="muted">
-                Pulsa “Veredicto IA” para una explicacion en lenguaje natural.
+                Pulsa “Veredicto con IA” para leer una explicación del análisis
+                en lenguaje natural.
               </div>
             )}
           </div>
@@ -222,16 +241,29 @@ export default function Home() {
                   <div className="pattern-item" key={`${p.key}-${p.time}-${i}`}>
                     <span className={`dot ${p.bias}`} />
                     <span className="name">{p.name}</span>
-                    <span className="strength">{p.strength}</span>
+                    <span className="strength" title="Fuerza del patrón, 0–100">
+                      {p.strength}
+                    </span>
                   </div>
                 ))}
               </div>
+            ) : data ? (
+              <div className="muted">
+                No se detectaron patrones en estas velas. Prueba otro intervalo
+                o símbolo.
+              </div>
             ) : (
-              <div className="muted">Sin patrones detectados.</div>
+              <div className="muted">Aquí verás los patrones al analizar.</div>
             )}
           </div>
         </div>
       </div>
+
+      <footer className="disclaimer">
+        Herramienta educativa. <strong>No es asesoría financiera.</strong> Los
+        patrones de velas son señales probabilísticas: confírmalos con volumen,
+        soportes y contexto antes de operar.
+      </footer>
     </main>
   );
 }

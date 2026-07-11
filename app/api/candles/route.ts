@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
   if (!INTERVALS.includes(interval)) {
     return NextResponse.json(
-      { error: `Intervalo invalido. Usa uno de: ${INTERVALS.join(", ")}` },
+      { error: `Intervalo no válido. Usa uno de: ${INTERVALS.join(", ")}.` },
       { status: 400 }
     );
   }
@@ -26,7 +26,9 @@ export async function GET(req: NextRequest) {
     const candles = await fetchCandles(symbol, interval, limit);
     if (candles.length === 0) {
       return NextResponse.json(
-        { error: `Sin datos para ${symbol}. Verifica el simbolo.` },
+        {
+          error: `No hay velas para “${symbol}”. Revisa que el símbolo esté bien escrito (ej. BTCUSDT).`,
+        },
         { status: 404 }
       );
     }
@@ -43,7 +45,12 @@ export async function GET(req: NextRequest) {
     };
     return NextResponse.json(payload);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Error desconocido";
-    return NextResponse.json({ error: message }, { status: 502 });
+    const raw = err instanceof Error ? err.message : "";
+    // Binance devuelve 400 / "Invalid symbol" cuando el par no existe.
+    const invalidSymbol = /invalid symbol|\b400\b/i.test(raw);
+    const message = invalidSymbol
+      ? `No encontramos “${symbol}” en Binance. Revisa que sea un par válido (ej. BTCUSDT, ETHUSDT).`
+      : "No pudimos conectar con Binance. Vuelve a intentarlo en unos segundos.";
+    return NextResponse.json({ error: message }, { status: invalidSymbol ? 404 : 502 });
   }
 }
