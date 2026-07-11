@@ -30,13 +30,30 @@ type RawKline = [
   ...unknown[]
 ];
 
+// Cache TTL en memoria: evita re-descargar velas identicas en rafagas
+// (p. ej. Analizar seguido de Veredicto IA). Por instancia; TTL corto.
+const CACHE_TTL_MS = 20_000;
+interface CacheEntry {
+  at: number;
+  data: Candle[];
+}
+const candleCache = new Map<string, CacheEntry>();
+
 export async function fetchCandles(
   symbol: string,
   interval: Interval,
   limit = 200
 ): Promise<Candle[]> {
+  const sym = symbol.toUpperCase();
+  const cacheKey = `${sym}|${interval}|${limit}`;
+
+  const cached = candleCache.get(cacheKey);
+  if (cached && Date.now() - cached.at < CACHE_TTL_MS) {
+    return cached.data;
+  }
+
   const url = `${BASE_URL}?symbol=${encodeURIComponent(
-    symbol.toUpperCase()
+    sym
   )}&interval=${interval}&limit=${limit}`;
 
   const res = await fetch(url, {
@@ -53,7 +70,7 @@ export async function fetchCandles(
 
   const raw = (await res.json()) as RawKline[];
 
-  return raw.map((k) => ({
+  const candles = raw.map((k) => ({
     time: Math.floor(k[0] / 1000), // ms -> segundos UTC
     open: parseFloat(k[1]),
     high: parseFloat(k[2]),
@@ -61,4 +78,7 @@ export async function fetchCandles(
     close: parseFloat(k[4]),
     volume: parseFloat(k[5]),
   }));
+
+  candleCache.set(cacheKey, { at: Date.now(), data: candles });
+  return candles;
 }

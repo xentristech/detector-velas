@@ -1,20 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { streamText, toTextStream, createTextStreamResponse } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
-import type { Pattern, Bias } from "@/lib/types";
+import { analyzeBodySchema, firstError } from "@/lib/schemas";
+import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-interface AnalyzeBody {
-  symbol: string;
-  interval: string;
-  verdict: { bias: Bias; score: number; lastPattern: Pattern | null };
-  recentPatterns: Pattern[];
-  lastPrice: number;
-}
+// Limite estricto: cada llamada consume cuota de OpenAI (cuesta dinero).
+const LIMIT = 10;
+const WINDOW_MS = 60_000;
 
 export async function POST(req: NextRequest) {
+  // 1) Rate limit por IP (protege la cuota de OpenAI).
+  const rl = rateLimit(clientKey(req, "analyze"), LIMIT, WINDOW_MS);
+  if (!rl.ok) {
+    return NextResponse.json(
+      {
+        error: `Demasiados análisis seguidos. Espera ${rl.retryAfterSec}s antes de pedir otro veredicto.`,
+      },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } }
+    );
+  }
+
+  // 2) Clave configurada.
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
@@ -26,14 +35,22 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: AnalyzeBody;
+  // 3) Validar el cuerpo.
+  let raw: unknown;
   try {
-    body = (await req.json()) as AnalyzeBody;
+    raw = await req.json();
   } catch {
-    return NextResponse.json({ error: "JSON invalido" }, { status: 400 });
+    return NextResponse.json({ error: "JSON no válido." }, { status: 400 });
   }
+  const parsed = analyzeBodySchema.safeParse(raw);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: firstError(parsed.error) },
+      { status: 400 }
+    );
+  }
+  const { symbol, interval, verdict, recentPatterns, lastPrice } = parsed.data;
 
-  const { symbol, interval, verdict, recentPatterns, lastPrice } = body;
   const modelId = process.env.OPENAI_MODEL || "gpt-4o-mini";
   const openai = createOpenAI({ apiKey });
 
@@ -72,12 +89,13 @@ Se conciso, directo y evita tecnicismos innecesarios.`;
         "Eres un analista tecnico experto en patrones de velas japonesas. Escribes claro, honesto y siempre aclaras que no es asesoria financiera.",
       prompt,
       temperature: 0.5,
+      // Control de costo: acota la salida (el veredicto es corto).
+      maxOutputTokens: 400,
       onError: ({ error }) => {
         console.error("[analyze] error de streaming:", error);
       },
     });
 
-    // Stream de texto plano (v7): el frontend lee el body y lo va mostrando.
     return createTextStreamResponse({
       stream: toTextStream({ stream: result.stream }),
     });
