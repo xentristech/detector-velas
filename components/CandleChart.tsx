@@ -136,7 +136,7 @@ export default function CandleChart({ candles, patterns }: Props) {
     const rsiSeries = chart.addSeries(
       LineSeries,
       {
-        color: "#7e8ce0",
+        color: "#a78bfa",
         lineWidth: 2,
         priceScaleId: "right",
         priceFormat: { type: "price", precision: 1, minMove: 0.1 },

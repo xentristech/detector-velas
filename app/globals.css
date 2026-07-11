@@ -3,12 +3,22 @@
   --panel: #141922;
   --panel-2: #1c2230;
   --border: #2a2f3a;
+  --border-strong: #3a4150;
   --text: #e6e9ef;
   --muted: #8b93a7;
+  --faint: #626b7e;
   --alcista: #26a69a;
+  --alcista-ink: #3fd3c4;
   --bajista: #ef5350;
   --neutral: #b0bec5;
-  --accent: #4c8dff;
+  /* Acento oro (confianza financiera), distinto del verde alcista */
+  --accent: #f5a524;
+  --accent-ink: #ffbf47;
+  --accent-contrast: #14110a;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", "Menlo", "Consolas",
+    monospace;
 }
 
 * {
@@ -21,7 +31,14 @@ body {
   padding: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* Accesibilidad: foco visible y consistente para navegacion por teclado */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
 .app {
@@ -38,7 +55,9 @@ body {
   margin-bottom: 18px;
 }
 .header h1 {
-  font-size: 22px;
+  font-size: 23px;
+  letter-spacing: -0.02em;
+  font-weight: 700;
   margin: 0;
 }
 .header p {
@@ -75,21 +94,38 @@ body {
 }
 button {
   background: var(--accent);
-  color: white;
-  border: none;
+  color: var(--accent-contrast);
+  border: 1px solid transparent;
   padding: 9px 16px;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 650;
   cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease, transform 0.05s ease;
+}
+button:hover:not(:disabled) {
+  background: var(--accent-ink);
+}
+button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 button:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 button.secondary {
   background: var(--panel-2);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+}
+button.secondary:hover:not(:disabled) {
+  background: var(--panel);
+  border-color: var(--accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
 }
 
 .grid {
@@ -137,8 +173,10 @@ button.secondary {
   gap: 12px;
 }
 .verdict .badge {
-  font-size: 20px;
-  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   padding: 6px 14px;
   border-radius: 10px;
 }
@@ -155,8 +193,11 @@ button.secondary {
   color: var(--neutral);
 }
 .score {
+  font-family: var(--font-mono);
   font-size: 13px;
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  cursor: help;
 }
 
 .meter {
@@ -217,8 +258,11 @@ button.secondary {
   flex: 1;
 }
 .pattern-item .strength {
+  font-family: var(--font-mono);
   color: var(--muted);
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: help;
 }
 
 .analysis {
