@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" role="img" aria-label="Velas japonesas">
+  <!-- Vela bajista (roja) -->
+  <line x1="22" y1="14" x2="22" y2="80" stroke="#ef5350" stroke-width="3" stroke-linecap="round"/>
+  <rect x="14" y="28" width="16" height="32" rx="2" fill="#ef5350"/>
+  <!-- Vela alcista (verde) -->
+  <line x1="50" y1="8" x2="50" y2="88" stroke="#26a69a" stroke-width="3" stroke-linecap="round"/>
+  <rect x="42" y="24" width="16" height="46" rx="2" fill="#26a69a"/>
+  <!-- Vela alcista (verde) -->
+  <line x1="78" y1="20" x2="78" y2="74" stroke="#26a69a" stroke-width="3" stroke-linecap="round"/>
+  <rect x="70" y="32" width="16" height="30" rx="2" fill="#26a69a"/>
+</svg>

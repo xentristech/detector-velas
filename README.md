@@ -1,6 +1,8 @@
 <div align="center">
 
-# 🕯️ Detector de Velas Japonesas
+<img src="assets/candles.svg" alt="Velas japonesas" width="76" />
+
+# Detector de Velas Japonesas
 
 **Detecta patrones de velas japonesas en cripto, visualízalos como en TradingView y obtén un veredicto con IA — además de un juego para aprender a reconocerlos.**
 
