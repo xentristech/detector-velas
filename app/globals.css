@@ -555,6 +555,29 @@ button.secondary:hover:not(:disabled) {
   margin-top: 4px;
 }
 
+/* Repaso con IA del patron fallado */
+.game-lesson {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lesson-btn {
+  align-self: flex-start;
+  background: var(--panel-2);
+  color: var(--accent-ink);
+  border: 1px solid var(--accent);
+  font-size: 13px;
+}
+.lesson-btn:hover:not(:disabled) {
+  background: var(--panel);
+}
+.lesson-text {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
 .disclaimer {
   margin-top: 24px;
   padding-top: 16px;

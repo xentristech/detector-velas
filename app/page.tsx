@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import PatternGame from "@/components/PatternGame";
+import Markdown from "@/components/Markdown";
 import type { CandlesResponse, Pattern } from "@/lib/types";
 
 // El chart es solo-cliente (usa canvas/DOM), se carga sin SSR.
@@ -64,35 +65,6 @@ function SparklesIcon() {
       <path d="M4 17v2" />
       <path d="M5 18H3" />
     </svg>
-  );
-}
-
-// Renderiza texto en negrita (**...**) dentro de una linea, seguro (nodos React).
-function renderInline(text: string, prefix: string) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.length > 4 && part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={prefix + i}>{part.slice(2, -2)}</strong>;
-    }
-    return part ? <span key={prefix + i}>{part}</span> : null;
-  });
-}
-
-// Markdown minimo para el analisis de IA: negritas + parrafos por linea.
-function Markdown({ text }: { text: string }) {
-  const lines = text.split("\n");
-  return (
-    <>
-      {lines.map((line, i) =>
-        line.trim() === "" ? (
-          <div key={i} className="md-gap" />
-        ) : (
-          <p key={i} className="md-p">
-            {renderInline(line, `${i}-`)}
-          </p>
-        )
-      )}
-    </>
   );
 }
 

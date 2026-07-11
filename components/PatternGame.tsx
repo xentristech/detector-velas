@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import Markdown from "@/components/Markdown";
 import type { GameRound } from "@/lib/types";
 
 const GameChart = dynamic(() => import("@/components/GameChart"), {
@@ -25,10 +26,17 @@ export default function PatternGame() {
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
 
+  // Repaso con IA del patron fallado.
+  const [lesson, setLesson] = useState<string | null>(null);
+  const [lessonLoading, setLessonLoading] = useState(false);
+  const [lessonError, setLessonError] = useState<string | null>(null);
+
   const loadRound = useCallback(async () => {
     setLoading(true);
     setError(null);
     setSelected(null);
+    setLesson(null);
+    setLessonError(null);
     try {
       const res = await fetch("/api/game", { cache: "no-store" });
       const json = await res.json();
@@ -63,6 +71,58 @@ export default function PatternGame() {
       setStreak(0);
     }
   };
+
+  // Pide a la IA un repaso didactico del patron que se fallo (streaming).
+  const requestLesson = useCallback(async () => {
+    if (!round) return;
+    setLessonLoading(true);
+    setLessonError(null);
+    setLesson("");
+    try {
+      const res = await fetch("/api/lesson", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: round.correctKey,
+          name: round.correctName,
+          bias: round.bias,
+        }),
+      });
+      if (!res.ok) {
+        let msg = "No se pudo generar el repaso.";
+        try {
+          const j = await res.json();
+          msg = j.error || msg;
+        } catch {
+          /* respuesta no-JSON */
+        }
+        throw new Error(msg);
+      }
+      const reader = res.body?.getReader();
+      if (!reader) {
+        setLesson(await res.text());
+        return;
+      }
+      const dec = new TextDecoder();
+      let acc = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        acc += dec.decode(value, { stream: true });
+        setLesson(acc);
+      }
+      if (!acc.trim()) {
+        setLessonError(
+          "La IA no devolvió texto. Puede ser el límite diario o que falte la clave."
+        );
+      }
+    } catch (e) {
+      setLessonError(e instanceof Error ? e.message : "Error desconocido.");
+      setLesson(null);
+    } finally {
+      setLessonLoading(false);
+    }
+  }, [round]);
 
   // Clase visual de cada boton segun el estado tras responder.
   const optionClass = (key: string) => {
@@ -147,6 +207,33 @@ export default function PatternGame() {
               <p className="muted" style={{ margin: 0 }}>
                 {round.description}
               </p>
+
+              {selected !== round.correctKey && (
+                <div className="game-lesson">
+                  {!lesson && !lessonLoading && !lessonError && (
+                    <button className="lesson-btn" onClick={requestLesson}>
+                      🎓 ¿Quieres repasar este patrón con IA?
+                    </button>
+                  )}
+                  {(lessonLoading || lesson) && (
+                    <div className="analysis lesson-text">
+                      {lesson && <Markdown text={lesson} />}
+                      {lessonLoading && (
+                        <span className="caret" aria-hidden="true" />
+                      )}
+                      {lessonLoading && !lesson && (
+                        <span className="muted">Preparando tu repaso…</span>
+                      )}
+                    </div>
+                  )}
+                  {lessonError && (
+                    <div className="error" style={{ marginTop: 8 }}>
+                      {lessonError}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <button
                 className="game-next"
                 onClick={loadRound}

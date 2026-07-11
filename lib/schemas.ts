@@ -56,6 +56,13 @@ export const analyzeBodySchema = z.object({
   lastPrice: z.number().nonnegative(),
 });
 
+// Body para /api/lesson (repaso de un patron en el juego)
+export const lessonBodySchema = z.object({
+  key: z.string().min(1).max(40),
+  name: z.string().min(1).max(60),
+  bias: biasSchema,
+});
+
 // Devuelve el primer mensaje de error legible de un resultado de Zod.
 export function firstError(error: z.ZodError): string {
   return error.issues[0]?.message ?? "Datos de entrada no válidos.";
