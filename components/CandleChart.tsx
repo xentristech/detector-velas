@@ -273,12 +273,13 @@ export default function CandleChart({ candles, patterns }: Props) {
     patternByTime.current = new Map(patterns.map((p) => [p.time, p]));
     if (!markersRef.current) return;
 
+    // Solo flechas (sin texto): marcan DONDE hay patron sin saturar el grafico.
+    // El nombre del patron se muestra en el tooltip al pasar el cursor o tocar.
     const markers: SeriesMarker<Time>[] = patterns.map((p) => ({
       time: p.time as UTCTimestamp,
       position: p.bias === "bajista" ? "aboveBar" : "belowBar",
       color: markerColor(p.bias),
       shape: p.bias === "bajista" ? "arrowDown" : "arrowUp",
-      text: p.name,
     }));
 
     markersRef.current.setMarkers(markers);

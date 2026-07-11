@@ -152,7 +152,9 @@ export default function Home() {
         setAnalysis(acc);
       }
       if (!acc.trim()) {
-        setError("La IA no devolvio texto. Revisa la clave o el modelo.");
+        setError(
+          "La IA no devolvió texto. Puede ser el límite diario de la API, la clave o el modelo. Intenta de nuevo más tarde."
+        );
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error desconocido");
@@ -220,7 +222,8 @@ export default function Home() {
       </div>
       <p id="symbol-hint" className="hint">
         Escribe un par de Binance (ej. BTCUSDT, ETHUSDT, SOLUSDT) y elige el
-        intervalo.
+        intervalo. Las flechas marcan los patrones; pasa el cursor o toca una
+        vela para ver sus valores y el patrón.
       </p>
 
       {error && <div className="error">{error}</div>}

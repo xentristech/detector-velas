@@ -159,7 +159,13 @@ button.secondary:hover:not(:disabled) {
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
-  height: 460px;
+  /* Responsive: mas bajo en moviles, mas alto en pantallas grandes. */
+  height: clamp(300px, 56vh, 560px);
+}
+@media (max-width: 900px) {
+  .chart-panel {
+    height: clamp(280px, 52vh, 420px);
+  }
 }
 
 .sidebar {
@@ -311,7 +317,7 @@ button.secondary:hover:not(:disabled) {
   position: absolute;
   z-index: 5;
   pointer-events: none;
-  width: 210px;
+  width: min(210px, 72vw);
   background: rgba(18, 22, 30, 0.96);
   border: 1px solid var(--border);
   border-radius: 8px;
