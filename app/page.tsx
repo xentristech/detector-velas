@@ -67,6 +67,35 @@ function SparklesIcon() {
   );
 }
 
+// Renderiza texto en negrita (**...**) dentro de una linea, seguro (nodos React).
+function renderInline(text: string, prefix: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.length > 4 && part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={prefix + i}>{part.slice(2, -2)}</strong>;
+    }
+    return part ? <span key={prefix + i}>{part}</span> : null;
+  });
+}
+
+// Markdown minimo para el analisis de IA: negritas + parrafos por linea.
+function Markdown({ text }: { text: string }) {
+  const lines = text.split("\n");
+  return (
+    <>
+      {lines.map((line, i) =>
+        line.trim() === "" ? (
+          <div key={i} className="md-gap" />
+        ) : (
+          <p key={i} className="md-p">
+            {renderInline(line, `${i}-`)}
+          </p>
+        )
+      )}
+    </>
+  );
+}
+
 export default function Home() {
   const [view, setView] = useState<"analizar" | "juego">("analizar");
   const [symbol, setSymbol] = useState("BTCUSDT");
@@ -300,7 +329,7 @@ export default function Home() {
             <h2>Análisis con IA</h2>
             {analyzing || analysis ? (
               <div className="analysis">
-                {analysis}
+                {analysis && <Markdown text={analysis} />}
                 {analyzing && <span className="caret" aria-hidden="true" />}
                 {analyzing && !analysis && (
                   <span className="muted">Redactando el veredicto…</span>
