@@ -1,8 +1,10 @@
 import type { Candle } from "./types";
 
-// API publica de Binance para velas (klines). No requiere API key.
-// Docs: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/market-data-endpoints
-const BASE_URL = "https://api.binance.com/api/v3/klines";
+// Endpoint publico de datos de mercado de Binance para velas (klines).
+// Se usa data-api.binance.vision en vez de api.binance.com porque este ultimo
+// bloquea las IPs de EE. UU. (donde corren los servidores de Vercel). El de
+// binance.vision expone los mismos datos publicos sin geo-bloqueo. Sin API key.
+const BASE_URL = "https://data-api.binance.vision/api/v3/klines";
 
 // Intervalos permitidos por Binance.
 export const INTERVALS = [
