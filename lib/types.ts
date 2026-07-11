@@ -28,6 +28,27 @@ export interface Pattern {
   description: string; // que significa el patron
 }
 
+// --- Juego de patrones ---
+
+// Una opcion de respuesta en el juego.
+export interface GameOption {
+  key: string;
+  name: string;
+}
+
+// Una ronda del juego "¿Que patron ves?".
+export interface GameRound {
+  symbol: string;
+  interval: string;
+  candles: Candle[]; // ventana de velas a mostrar
+  markerTime: number; // vela donde termina el patron (para marcarla)
+  correctKey: string;
+  correctName: string;
+  bias: Bias;
+  description: string; // explicacion que se revela al responder
+  options: GameOption[]; // 4 opciones barajadas (incluye la correcta)
+}
+
 // Respuesta del endpoint /api/candles
 export interface CandlesResponse {
   symbol: string;

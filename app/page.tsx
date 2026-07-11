@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import PatternGame from "@/components/PatternGame";
 import type { CandlesResponse, Pattern } from "@/lib/types";
 
 // El chart es solo-cliente (usa canvas/DOM), se carga sin SSR.
@@ -67,6 +68,7 @@ function SparklesIcon() {
 }
 
 export default function Home() {
+  const [view, setView] = useState<"analizar" | "juego">("analizar");
   const [symbol, setSymbol] = useState("BTCUSDT");
   const [interval, setInterval] = useState("1h");
   const [data, setData] = useState<CandlesResponse | null>(null);
@@ -181,6 +183,29 @@ export default function Home() {
         <p>Cripto · datos de Binance · gráfico estilo TradingView · veredicto con IA</p>
       </div>
 
+      <div className="tabs" role="tablist" aria-label="Secciones">
+        <button
+          className={`tab ${view === "analizar" ? "active" : ""}`}
+          role="tab"
+          aria-selected={view === "analizar"}
+          onClick={() => setView("analizar")}
+        >
+          Analizador
+        </button>
+        <button
+          className={`tab ${view === "juego" ? "active" : ""}`}
+          role="tab"
+          aria-selected={view === "juego"}
+          onClick={() => setView("juego")}
+        >
+          Juego de patrones
+        </button>
+      </div>
+
+      {view === "juego" && <PatternGame />}
+
+      {view === "analizar" && (
+        <>
       <div className="controls">
         <div className="field">
           <label htmlFor="symbol">Símbolo</label>
@@ -314,6 +339,8 @@ export default function Home() {
           </div>
         </div>
       </div>
+        </>
+      )}
 
       <footer className="disclaimer">
         <p>

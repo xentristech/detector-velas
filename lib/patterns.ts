@@ -1,5 +1,27 @@
 import type { Candle, Pattern, Bias } from "./types";
 
+// Catalogo completo de patrones (para el juego: opciones y distractores).
+// Nombres con acentos para mostrar en la UI; se emparejan por `key`.
+export const PATTERN_CATALOG: { key: string; name: string; bias: Bias }[] = [
+  { key: "morning_star", name: "Estrella de la mañana", bias: "alcista" },
+  { key: "evening_star", name: "Estrella del atardecer", bias: "bajista" },
+  { key: "three_white_soldiers", name: "Tres soldados blancos", bias: "alcista" },
+  { key: "three_black_crows", name: "Tres cuervos negros", bias: "bajista" },
+  { key: "bullish_engulfing", name: "Envolvente alcista", bias: "alcista" },
+  { key: "bearish_engulfing", name: "Envolvente bajista", bias: "bajista" },
+  { key: "piercing_line", name: "Línea penetrante", bias: "alcista" },
+  { key: "dark_cloud_cover", name: "Nube oscura", bias: "bajista" },
+  { key: "bullish_harami", name: "Harami alcista", bias: "alcista" },
+  { key: "bearish_harami", name: "Harami bajista", bias: "bajista" },
+  { key: "bullish_marubozu", name: "Marubozu alcista", bias: "alcista" },
+  { key: "bearish_marubozu", name: "Marubozu bajista", bias: "bajista" },
+  { key: "hammer", name: "Martillo", bias: "alcista" },
+  { key: "hanging_man", name: "Hombre colgado", bias: "bajista" },
+  { key: "shooting_star", name: "Estrella fugaz", bias: "bajista" },
+  { key: "inverted_hammer", name: "Martillo invertido", bias: "alcista" },
+  { key: "doji", name: "Doji", bias: "neutral" },
+];
+
 // ---------------------------------------------------------------------------
 // Motor de deteccion de patrones de velas japonesas (por reglas, sin IA).
 // Preciso, deterministico y gratis. La IA solo redacta el veredicto despues.
