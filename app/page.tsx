@@ -316,9 +316,14 @@ export default function Home() {
       </div>
 
       <footer className="disclaimer">
-        Herramienta educativa. <strong>No es asesoría financiera.</strong> Los
-        patrones de velas son señales probabilísticas: confírmalos con volumen,
-        soportes y contexto antes de operar.
+        <p>
+          Herramienta educativa. <strong>No es asesoría financiera.</strong> Los
+          patrones de velas son señales probabilísticas: confírmalos con
+          volumen, soportes y contexto antes de operar.
+        </p>
+        <p className="copyright">
+          © 2026 Xentris LLC · Los Tres Dioses. Todos los derechos reservados.
+        </p>
       </footer>
     </main>
   );
