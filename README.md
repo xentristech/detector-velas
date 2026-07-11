@@ -29,6 +29,21 @@
 > [!NOTE]
 > El gráfico, el RSI, la detección y el juego funcionan **sin** clave de OpenAI. La clave solo se necesita para el veredicto y las lecciones con IA.
 
+## Vistazo
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="assets/screenshot-analizador.png" alt="Analizador: gráfico de velas con RSI, patrones y veredicto" /><br />
+      <sub><b>Analizador</b> — velas + RSI + patrones + veredicto</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="assets/screenshot-juego.png" alt="Juego de patrones con puntaje, racha y repaso con IA" /><br />
+      <sub><b>Juego de patrones</b> — adivina, puntúa y repasa con IA</sub>
+    </td>
+  </tr>
+</table>
+
 ## Cómo funciona
 
 ```
