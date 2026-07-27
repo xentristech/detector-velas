@@ -1,12 +1,14 @@
 <div align="center">
 
-<img src="assets/candles.svg" alt="Velas japonesas" width="76" />
+<img src="assets/xentris-mark.svg" alt="Xentris" width="66" />
 
 # Detector de Velas Japonesas
 
 **Detecta patrones de velas japonesas en cripto, visualízalos como en TradingView y obtén un veredicto con IA — además de un juego para aprender a reconocerlos.**
 
-[![Demo en vivo](https://img.shields.io/badge/▶_Demo_en_vivo-detector--velas.vercel.app-f5a524?style=for-the-badge)](https://detector-velas.vercel.app)
+<sub>Un producto de **XENTRIS** · Más que tecnología, soluciones que impulsan tu crecimiento.</sub>
+
+[![Demo en vivo](https://img.shields.io/badge/▶_Demo_en_vivo-detector--velas.vercel.app-8B3FD1?style=for-the-badge)](https://detector-velas.vercel.app)
 
 [![Next.js](https://img.shields.io/badge/Next.js_15-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React_19-61DAFB?logo=react&logoColor=black)](https://react.dev/)
