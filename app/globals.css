@@ -380,6 +380,55 @@ button.secondary:hover:not(:disabled) {
 .chart-tip-pat.neutral {
   color: var(--neutral);
 }
+.chart-tip-ma {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Botón para mostrar/ocultar medias móviles */
+.ma-toggle {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  background: rgba(14, 17, 22, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: color 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.ma-toggle:hover {
+  border-color: var(--accent);
+}
+.ma-toggle.on {
+  color: var(--text, #d1d4dc);
+}
+.ma-toggle:not(.on) {
+  opacity: 0.6;
+}
+.ma-toggle:not(.on) .ma-dot {
+  opacity: 0.35;
+}
+.ma-dot {
+  width: 9px;
+  height: 3px;
+  border-radius: 2px;
+  display: inline-block;
+}
 
 .error {
   background: rgba(239, 83, 80, 0.12);

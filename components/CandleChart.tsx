@@ -20,12 +20,16 @@ import {
 } from "lightweight-charts";
 import { useEffect, useRef, useState } from "react";
 import type { Candle, Pattern } from "@/lib/types";
-import { computeRSI } from "@/lib/indicators";
+import { computeRSI, computeSMA } from "@/lib/indicators";
 
 interface Props {
   candles: Candle[];
   patterns: Pattern[];
 }
+
+// Medias móviles a dibujar sobre el precio (rápida y lenta).
+const MA_FAST = { period: 20, color: "#42a5f5" }; // azul
+const MA_SLOW = { period: 50, color: "#ffa726" }; // ámbar
 
 // Color del marcador segun el sesgo del patron.
 function markerColor(bias: Pattern["bias"]) {
@@ -46,6 +50,8 @@ interface TipState {
   close: number;
   bull: boolean;
   pattern: Pattern | null;
+  maFast: number | null;
+  maSlow: number | null;
 }
 
 const EMPTY_TIP: TipState = {
@@ -59,6 +65,8 @@ const EMPTY_TIP: TipState = {
   close: 0,
   bull: true,
   pattern: null,
+  maFast: null,
+  maSlow: null,
 };
 
 // Formatea un precio con una cantidad razonable de decimales segun su magnitud.
@@ -82,12 +90,18 @@ export default function CandleChart({ candles, patterns }: Props) {
   const volumeSeriesRef = useRef<ISeriesApi<"Histogram"> | null>(null);
   const rsiSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const rsiLinesRef = useRef<IPriceLine[]>([]);
+  const maFastSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const maSlowSeriesRef = useRef<ISeriesApi<"Line"> | null>(null);
   const markersRef = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
 
   // Mapa time -> patron para el tooltip (se actualiza con los patrones).
   const patternByTime = useRef<Map<number, Pattern>>(new Map());
+  // Mapas time -> valor de cada media móvil (para el tooltip).
+  const maFastByTime = useRef<Map<number, number>>(new Map());
+  const maSlowByTime = useRef<Map<number, number>>(new Map());
 
   const [tip, setTip] = useState<TipState>(EMPTY_TIP);
+  const [showMA, setShowMA] = useState(true);
 
   // Crear el chart una sola vez.
   useEffect(() => {
@@ -132,6 +146,25 @@ export default function CandleChart({ candles, patterns }: Props) {
       scaleMargins: { top: 0.8, bottom: 0 },
     });
 
+    // Medias móviles sobre el precio (mismo eje que las velas).
+    const maCommon = {
+      priceScaleId: "right" as const,
+      lineWidth: 2 as const,
+      priceLineVisible: false,
+      lastValueVisible: false,
+      crosshairMarkerVisible: false,
+    };
+    const maFastSeries = chart.addSeries(
+      LineSeries,
+      { ...maCommon, color: MA_FAST.color, title: `MA${MA_FAST.period}` },
+      0
+    );
+    const maSlowSeries = chart.addSeries(
+      LineSeries,
+      { ...maCommon, color: MA_SLOW.color, title: `MA${MA_SLOW.period}` },
+      0
+    );
+
     // --- Pane 1: RSI ---
     const rsiSeries = chart.addSeries(
       LineSeries,
@@ -173,6 +206,8 @@ export default function CandleChart({ candles, patterns }: Props) {
     candleSeriesRef.current = candleSeries;
     volumeSeriesRef.current = volumeSeries;
     rsiSeriesRef.current = rsiSeries;
+    maFastSeriesRef.current = maFastSeries;
+    maSlowSeriesRef.current = maSlowSeries;
     markersRef.current = createSeriesMarkers(candleSeries, []);
 
     // --- Tooltip: seguir el crosshair ---
@@ -217,6 +252,8 @@ export default function CandleChart({ candles, patterns }: Props) {
         close: bar.close,
         bull: bar.close >= bar.open,
         pattern: patternByTime.current.get(timeSec) ?? null,
+        maFast: maFastByTime.current.get(timeSec) ?? null,
+        maSlow: maSlowByTime.current.get(timeSec) ?? null,
       });
     };
     chart.subscribeCrosshairMove(onMove);
@@ -228,6 +265,8 @@ export default function CandleChart({ candles, patterns }: Props) {
       volumeSeriesRef.current = null;
       rsiSeriesRef.current = null;
       rsiLinesRef.current = [];
+      maFastSeriesRef.current = null;
+      maSlowSeriesRef.current = null;
       chartRef.current = null;
       chart.remove();
     };
@@ -238,6 +277,8 @@ export default function CandleChart({ candles, patterns }: Props) {
     const candleSeries = candleSeriesRef.current;
     const volumeSeries = volumeSeriesRef.current;
     const rsiSeries = rsiSeriesRef.current;
+    const maFastSeries = maFastSeriesRef.current;
+    const maSlowSeries = maSlowSeriesRef.current;
     if (!candleSeries || !volumeSeries || !rsiSeries) return;
 
     const candleData: CandlestickData<Time>[] = candles.map((c) => ({
@@ -262,11 +303,32 @@ export default function CandleChart({ candles, patterns }: Props) {
       value: p.value,
     }));
 
+    const maFast = computeSMA(candles, MA_FAST.period);
+    const maSlow = computeSMA(candles, MA_SLOW.period);
+    const maFastData: LineData<Time>[] = maFast.map((p) => ({
+      time: p.time as UTCTimestamp,
+      value: p.value,
+    }));
+    const maSlowData: LineData<Time>[] = maSlow.map((p) => ({
+      time: p.time as UTCTimestamp,
+      value: p.value,
+    }));
+    maFastByTime.current = new Map(maFast.map((p) => [p.time, p.value]));
+    maSlowByTime.current = new Map(maSlow.map((p) => [p.time, p.value]));
+
     candleSeries.setData(candleData);
     volumeSeries.setData(volumeData);
     rsiSeries.setData(rsiData);
+    maFastSeries?.setData(maFastData);
+    maSlowSeries?.setData(maSlowData);
     chartRef.current?.timeScale().fitContent();
   }, [candles]);
+
+  // Mostrar u ocultar las medias móviles.
+  useEffect(() => {
+    maFastSeriesRef.current?.applyOptions({ visible: showMA });
+    maSlowSeriesRef.current?.applyOptions({ visible: showMA });
+  }, [showMA]);
 
   // Actualizar marcadores y el mapa de patrones cuando cambian los patrones.
   useEffect(() => {
@@ -287,10 +349,21 @@ export default function CandleChart({ candles, patterns }: Props) {
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <button
+        type="button"
+        className={`ma-toggle ${showMA ? "on" : ""}`}
+        onClick={() => setShowMA((v) => !v)}
+        aria-pressed={showMA}
+        title="Mostrar u ocultar medias móviles"
+      >
+        <span className="ma-dot" style={{ background: MA_FAST.color }} />
+        <span className="ma-dot" style={{ background: MA_SLOW.color }} />
+        Medias móviles
+      </button>
       <div
         ref={containerRef}
         style={{ width: "100%", height: "100%" }}
-        aria-label="Grafico de velas japonesas con RSI"
+        aria-label="Grafico de velas japonesas con RSI y medias moviles"
       />
       {tip.visible && (
         <div
@@ -306,6 +379,20 @@ export default function CandleChart({ candles, patterns }: Props) {
             <span>C</span>
             <b className={tip.bull ? "up" : "down"}>{fmtPrice(tip.close)}</b>
           </div>
+          {showMA && (tip.maFast !== null || tip.maSlow !== null) && (
+            <div className="chart-tip-ma">
+              {tip.maFast !== null && (
+                <span style={{ color: MA_FAST.color }}>
+                  MA{MA_FAST.period} {fmtPrice(tip.maFast)}
+                </span>
+              )}
+              {tip.maSlow !== null && (
+                <span style={{ color: MA_SLOW.color }}>
+                  MA{MA_SLOW.period} {fmtPrice(tip.maSlow)}
+                </span>
+              )}
+            </div>
+          )}
           {tip.pattern && (
             <div className={`chart-tip-pat ${tip.pattern.bias}`}>
               {tip.pattern.name} · {tip.pattern.strength}/100

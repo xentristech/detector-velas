@@ -50,3 +50,41 @@ export function computeRSI(candles: Candle[], period = 14): IndicatorPoint[] {
 
   return out;
 }
+
+// SMA (media móvil simple) sobre el cierre.
+// Devuelve un punto por cada vela a partir de la #`period-1` (la línea empieza
+// cuando ya hay `period` cierres para promediar).
+export function computeSMA(candles: Candle[], period: number): IndicatorPoint[] {
+  if (period < 1 || candles.length < period) return [];
+
+  const out: IndicatorPoint[] = [];
+  let sum = 0;
+  for (let i = 0; i < candles.length; i++) {
+    sum += candles[i].close;
+    if (i >= period) sum -= candles[i - period].close;
+    if (i >= period - 1) {
+      out.push({ time: candles[i].time, value: sum / period });
+    }
+  }
+  return out;
+}
+
+// EMA (media móvil exponencial) sobre el cierre.
+// Se siembra con la SMA de las primeras `period` velas y luego suaviza.
+export function computeEMA(candles: Candle[], period: number): IndicatorPoint[] {
+  if (period < 1 || candles.length < period) return [];
+
+  const k = 2 / (period + 1);
+  const out: IndicatorPoint[] = [];
+
+  let ema = 0;
+  for (let i = 0; i < period; i++) ema += candles[i].close;
+  ema /= period;
+  out.push({ time: candles[period - 1].time, value: ema });
+
+  for (let i = period; i < candles.length; i++) {
+    ema = candles[i].close * k + ema * (1 - k);
+    out.push({ time: candles[i].time, value: ema });
+  }
+  return out;
+}
