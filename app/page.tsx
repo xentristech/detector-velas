@@ -19,6 +19,38 @@ function biasLabel(bias: string) {
   return "NEUTRAL";
 }
 
+// Monograma de marca Xentris (degradado púrpura del logo oficial).
+function XentrisMark() {
+  return (
+    <svg
+      className="xmark"
+      viewBox="0 0 64 64"
+      width="30"
+      height="30"
+      role="img"
+      aria-label="Xentris"
+    >
+      <defs>
+        <linearGradient
+          id="xentris-grad"
+          x1="32"
+          y1="6"
+          x2="32"
+          y2="58"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stopColor="#A24DE0" />
+          <stop offset="1" stopColor="#3E1F73" />
+        </linearGradient>
+      </defs>
+      <g fill="none" stroke="url(#xentris-grad)" strokeWidth="9">
+        <path d="M22 8 C22 26 42 38 42 56" />
+        <path d="M42 8 C42 26 22 38 22 56" />
+      </g>
+    </svg>
+  );
+}
+
 // Iconos SVG (estilo Lucide) — reemplazan emojis para verse igual en todo sistema.
 function CandleIcon() {
   return (
@@ -176,6 +208,12 @@ export default function Home() {
 
   return (
     <main className="app">
+      <div className="brandbar">
+        <XentrisMark />
+        <span className="wordmark">XENTRIS</span>
+        <span className="brand-tag">Más que tecnología</span>
+      </div>
+
       <div className="header">
         <h1>
           <CandleIcon />

@@ -110,20 +110,20 @@ export default function CandleChart({ candles, patterns }: Props) {
     const chart = createChart(containerRef.current, {
       autoSize: true,
       layout: {
-        background: { color: "#0e1116" },
-        textColor: "#d1d4dc",
-        panes: { separatorColor: "#2a2f3a", separatorHoverColor: "#3a4150" },
+        background: { color: "#0a1b33" },
+        textColor: "#c4cfe4",
+        panes: { separatorColor: "#23385a", separatorHoverColor: "#3a5178" },
       },
       grid: {
-        vertLines: { color: "#1c2230" },
-        horzLines: { color: "#1c2230" },
+        vertLines: { color: "#152a49" },
+        horzLines: { color: "#152a49" },
       },
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
-        borderColor: "#2a2f3a",
+        borderColor: "#23385a",
       },
-      rightPriceScale: { borderColor: "#2a2f3a" },
+      rightPriceScale: { borderColor: "#23385a" },
       crosshair: { mode: 1 },
     });
 
@@ -169,7 +169,7 @@ export default function CandleChart({ candles, patterns }: Props) {
     const rsiSeries = chart.addSeries(
       LineSeries,
       {
-        color: "#a78bfa",
+        color: "#4aa3ff",
         lineWidth: 2,
         priceScaleId: "right",
         priceFormat: { type: "price", precision: 1, minMove: 0.1 },

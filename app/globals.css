@@ -1,20 +1,22 @@
 :root {
-  --bg: #0b0e13;
-  --panel: #141922;
-  --panel-2: #1c2230;
-  --border: #2a2f3a;
-  --border-strong: #3a4150;
-  --text: #e6e9ef;
-  --muted: #8b93a7;
-  --faint: #626b7e;
+  /* Navy Xentris (brandbook) como base */
+  --bg: #0a1b33;
+  --panel: #10233f;
+  --panel-2: #17304f;
+  --border: #23385a;
+  --border-strong: #3a5178;
+  --text: #eaf0f9;
+  --muted: #93a3c0;
+  --faint: #64769a;
   --alcista: #26a69a;
   --alcista-ink: #3fd3c4;
   --bajista: #ef5350;
-  --neutral: #b0bec5;
-  /* Acento oro (confianza financiera), distinto del verde alcista */
-  --accent: #f5a524;
-  --accent-ink: #ffbf47;
-  --accent-contrast: #14110a;
+  --neutral: #9fb2cf;
+  /* Acento púrpura de marca Xentris (degradado del logo) */
+  --accent: #8b3fd1;
+  --accent-ink: #b07bf0;
+  --accent-contrast: #ffffff;
+  --accent-grad: linear-gradient(135deg, #a24de0 0%, #6d2fb8 55%, #3e1f73 100%);
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
   --font-mono: ui-monospace, "Cascadia Code", "SF Mono", "Menlo", "Consolas",
@@ -32,6 +34,26 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
+}
+
+/* Aurora de marca: resplandor púrpura/índigo sutil y fijo al fondo */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      60% 45% at 82% 0%,
+      rgba(139, 63, 209, 0.16),
+      transparent 70%
+    ),
+    radial-gradient(
+      55% 40% at 10% 8%,
+      rgba(53, 69, 214, 0.14),
+      transparent 65%
+    );
 }
 
 /* Accesibilidad: foco visible y consistente para navegacion por teclado */
@@ -77,6 +99,38 @@ body {
   font-size: 14px;
 }
 
+/* Marca Xentris en el header */
+.brandbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.brandbar .xmark {
+  height: 30px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 2px 10px rgba(139, 63, 209, 0.45));
+}
+.brandbar .wordmark {
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.24em;
+  color: var(--text);
+}
+.brandbar .brand-tag {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+@media (max-width: 560px) {
+  .brandbar .brand-tag {
+    display: none;
+  }
+}
+
 .controls {
   display: flex;
   gap: 10px;
@@ -108,7 +162,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  background: var(--accent);
+  background: var(--accent-grad);
   color: var(--accent-contrast);
   border: 1px solid transparent;
   padding: 9px 16px;
@@ -116,10 +170,11 @@ button {
   font-size: 14px;
   font-weight: 650;
   cursor: pointer;
-  transition: background 0.15s ease, opacity 0.15s ease, transform 0.05s ease;
+  box-shadow: 0 2px 14px -6px rgba(139, 63, 209, 0.7);
+  transition: filter 0.15s ease, opacity 0.15s ease, transform 0.05s ease;
 }
 button:hover:not(:disabled) {
-  background: var(--accent-ink);
+  filter: brightness(1.12);
 }
 button:active:not(:disabled) {
   transform: translateY(1px);
@@ -330,7 +385,7 @@ button.secondary:hover:not(:disabled) {
   z-index: 5;
   pointer-events: none;
   width: min(210px, 72vw);
-  background: rgba(18, 22, 30, 0.96);
+  background: rgba(10, 27, 51, 0.96);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 10px;
@@ -404,7 +459,7 @@ button.secondary:hover:not(:disabled) {
   font-size: 11.5px;
   font-weight: 600;
   color: var(--muted);
-  background: rgba(14, 17, 22, 0.72);
+  background: rgba(10, 27, 51, 0.72);
   border: 1px solid var(--border);
   border-radius: 999px;
   cursor: pointer;

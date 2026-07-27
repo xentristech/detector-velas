@@ -180,7 +180,7 @@ export default function PatternGame() {
             <h2>¿Qué patrón ves?</h2>
             <p className="muted" style={{ marginTop: 0 }}>
               {round
-                ? `Marcado en ${round.symbol} · ${round.interval}. Mira las velas del círculo dorado.`
+                ? `Marcado en ${round.symbol} · ${round.interval}. Mira las velas del círculo púrpura.`
                 : "Preparando…"}
             </p>
 

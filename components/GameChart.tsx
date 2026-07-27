@@ -33,19 +33,19 @@ export default function GameChart({ candles, markerTime }: Props) {
     const chart = createChart(containerRef.current, {
       autoSize: true,
       layout: {
-        background: { color: "#0e1116" },
-        textColor: "#d1d4dc",
+        background: { color: "#0a1b33" },
+        textColor: "#c4cfe4",
       },
       grid: {
-        vertLines: { color: "#1c2230" },
-        horzLines: { color: "#1c2230" },
+        vertLines: { color: "#152a49" },
+        horzLines: { color: "#152a49" },
       },
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
-        borderColor: "#2a2f3a",
+        borderColor: "#23385a",
       },
-      rightPriceScale: { borderColor: "#2a2f3a" },
+      rightPriceScale: { borderColor: "#23385a" },
       crosshair: { mode: 1 },
       handleScroll: false,
       handleScale: false,
@@ -88,13 +88,13 @@ export default function GameChart({ candles, markerTime }: Props) {
 
   useEffect(() => {
     if (!markersRef.current) return;
-    // Marcador NEUTRO (circulo dorado, sin texto ni flecha) para no delatar
+    // Marcador NEUTRO (circulo purpura, sin texto ni flecha) para no delatar
     // el patron ni su direccion: solo indica DONDE mirar.
     const markers: SeriesMarker<Time>[] = [
       {
         time: markerTime as UTCTimestamp,
         position: "aboveBar",
-        color: "#f5a524",
+        color: "#a24de0",
         shape: "circle",
       },
     ];
