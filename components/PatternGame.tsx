@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Markdown from "@/components/Markdown";
+import Confetti from "@/components/Confetti";
 import type { GameRound } from "@/lib/types";
 
 const GameChart = dynamic(() => import("@/components/GameChart"), {
@@ -25,6 +26,8 @@ export default function PatternGame() {
   const [total, setTotal] = useState(0);
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
+  // Contador que se incrementa en cada acierto para relanzar el confeti.
+  const [burst, setBurst] = useState(0);
 
   // Repaso con IA del patron fallado.
   const [lesson, setLesson] = useState<string | null>(null);
@@ -62,6 +65,7 @@ export default function PatternGame() {
     setTotal((t) => t + 1);
     if (key === round.correctKey) {
       setScore((s) => s + 1);
+      setBurst((b) => b + 1);
       setStreak((st) => {
         const next = st + 1;
         setBestStreak((b) => Math.max(b, next));
@@ -138,15 +142,22 @@ export default function PatternGame() {
     <div className="game">
       <div className="game-scorebar">
         <div className="stat">
-          <span className="stat-num">{score}/{total}</span>
+          <span key={score} className="stat-num pop">
+            {score}/{total}
+          </span>
           <span className="stat-lbl">aciertos ({pct}%)</span>
         </div>
-        <div className="stat">
-          <span className="stat-num">{streak}🔥</span>
+        <div className={`stat ${streak >= 3 ? "hot" : ""}`}>
+          <span key={streak} className="stat-num pop">
+            {streak}
+            <span className="stat-fire">🔥</span>
+          </span>
           <span className="stat-lbl">racha</span>
         </div>
         <div className="stat">
-          <span className="stat-num">{bestStreak}</span>
+          <span key={bestStreak} className="stat-num pop">
+            {bestStreak}
+          </span>
           <span className="stat-lbl">mejor racha</span>
         </div>
       </div>
@@ -174,10 +185,11 @@ export default function PatternGame() {
             </p>
 
             <div className="game-options">
-              {round?.options.map((o) => (
+              {round?.options.map((o, idx) => (
                 <button
                   key={o.key}
                   className={optionClass(o.key)}
+                  style={{ "--i": idx } as React.CSSProperties}
                   onClick={() => choose(o.key)}
                   disabled={answered || loading}
                 >
@@ -189,6 +201,7 @@ export default function PatternGame() {
 
           {answered && round && (
             <div className="card game-feedback">
+              {selected === round.correctKey && <Confetti key={burst} />}
               <div
                 className={`game-result ${
                   selected === round.correctKey ? "ok" : "no"
